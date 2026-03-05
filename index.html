@@ -524,30 +524,6 @@
     }
     .pace-display strong { color: #c8ff00 !important; font-size: 16px; }
 
-    .units-toggle {
-      display: flex;
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .unit-btn {
-      padding: 4px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      font-family: 'DM Sans', sans-serif;
-      letter-spacing: 0.06em;
-      background: transparent;
-      border: none;
-      color: #555;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .unit-btn.active {
-      background: #c8ff00;
-      color: #000;
-    }
-    .unit-btn:not(.active):hover { color: #c0c0c0; }
 
     .finish-chip {
       border-color: rgba(200,255,0,0.25) !important;
@@ -733,9 +709,10 @@
       padding: 4px 8px;
       border-radius: 3px;
     }
-    .b-easy  { background: rgba(100,200,255,0.12); color: #6ec8f5; }
-    .b-long  { background: rgba(200,255,0,0.1); color: #c8ff00; }
-    .b-tempo { background: rgba(255,107,53,0.14); color: #ff6b35; }
+    .b-easy      { background: rgba(100,200,255,0.12); color: #6ec8f5; }
+    .b-long      { background: rgba(200,255,0,0.1); color: #c8ff00; }
+    .b-tempo     { background: rgba(255,107,53,0.14); color: #ff6b35; }
+    .b-intervals { background: rgba(200,100,255,0.14); color: #cc64ff; }
     .b-rest  { background: rgba(255,255,255,0.05); color: #555; }
     .run-dist {
       font-weight: 700;
@@ -970,7 +947,7 @@
               <div class="pace-col" id="cur-sec-col"></div>
             </div>
           </div>
-          <div style="font-size:13px;color:#888;white-space:nowrap" id="cur-pace-unit-label">/ km</div>
+
         </div>
         <div class="pace-display" id="cur-pace-display">Current easy pace: <strong>6:30 / km</strong></div>
         <div style="font-size:12px;color:#666;margin-top:2px">Not sure? Use your parkrun pace + 60–90 sec</div>
@@ -1007,11 +984,7 @@
       <div class="form-group">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
           <label id="pace-label">Target Race Pace</label>
-          <div class="units-toggle">
-            <button class="unit-btn active" id="btn-km" onclick="setUnits('km')">km</button>
-            <button class="unit-btn" id="btn-mi" onclick="setUnits('mi')">mi</button>
           </div>
-        </div>
         <div style="display:flex;gap:16px;align-items:flex-start">
           <div style="flex:1">
             <span class="pace-col-header">Minutes</span>
@@ -1028,7 +1001,7 @@
               <div class="pace-col" id="sec-col"></div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;padding-top:36px;font-size:13px;color:#888" id="pace-unit-label">/ km</div>
+
         </div>
         <div class="pace-display" id="pace-display">Target pace: <strong>5:30 / km</strong></div>
       </div>
@@ -1150,21 +1123,17 @@ let selectedRuns  = 4;
 let planData      = null;
 let paceMinutes   = 5;
 let paceSeconds   = 30;
-let useMetric     = true; // km vs miles
 
-const KM_TO_MI = 0.621371;
 
 function fmtDist(km) {
-  if (useMetric) return `${Math.round(km * 10) / 10}km`;
-  return `${Math.round(km * KM_TO_MI * 10) / 10}mi`;
+  return `${Math.round(km * 10) / 10}km`;
 }
 
 function fmtPace(secPerKm) {
-  // pace is always stored as sec/km internally; display converts if miles
-  const sec = useMetric ? secPerKm : secPerKm * KM_TO_MI;
+  const sec = secPerKm;
   const m = Math.floor(sec / 60);
   const s = Math.round(sec % 60);
-  const unit = useMetric ? '/km' : '/mi';
+  const unit = '/km';
   return `${m}:${s.toString().padStart(2,'0')}${unit}`;
 }
 
@@ -1177,17 +1146,7 @@ function projectedFinish(targetKm, paceSec) {
   return `${m}m ${s.toString().padStart(2,'0')}s`;
 }
 
-function setUnits(unit) {
-  useMetric = unit === 'km';
-  document.getElementById('btn-km').classList.toggle('active', useMetric);
-  document.getElementById('btn-mi').classList.toggle('active', !useMetric);
-  document.getElementById('pace-unit-label').textContent = useMetric ? '/ km' : '/ mi';
-  document.getElementById('cur-pace-unit-label').textContent = useMetric ? '/ km' : '/ mi';
-  document.getElementById('current-km-unit').textContent = useMetric ? 'km / week' : 'mi / week';
-  document.getElementById('custom-dist-label').textContent = useMetric ? 'Custom Distance (km)' : 'Custom Distance (mi)';
-  updatePaceDisplay();
-  if (planData) renderPlan(planData);
-}
+
 
 const FITNESS_BASE = {
   beginner:   0.30,
@@ -1201,12 +1160,12 @@ let curPaceSeconds  = 30;
 let currentWeeklyKm = 20;
 
 function getCurrentWeeklyKm() {
-  return useMetric ? currentWeeklyKm : currentWeeklyKm * MI_TO_KM;
+  return currentWeeklyKm;
 }
 
 function updateCurrentKmDisplay() {
   const val = currentWeeklyKm;
-  const unit = useMetric ? 'km' : 'mi';
+  const unit = 'km';
   document.getElementById('current-km-display').innerHTML =
     `Current weekly: <strong>≈ ${val} ${unit}</strong>`;
   const hint = document.getElementById('current-km-hint');
@@ -1306,7 +1265,7 @@ function buildPaceWheels() {
 
 function updateCurPaceDisplay() {
   const s = curPaceSeconds.toString().padStart(2, '0');
-  const unit = useMetric ? '/ km' : '/ mi';
+  const unit = '/ km';
   document.getElementById('cur-pace-display').innerHTML =
     `Current easy pace: <strong>${curPaceMinutes}:${s} ${unit}</strong>`;
 }
@@ -1387,7 +1346,7 @@ function buildWheel(colId, min, max, defaultVal, onChange, byFive = false, byFiv
 
 function updatePaceDisplay() {
   const s = paceSeconds.toString().padStart(2, '0');
-  const unit = useMetric ? '/ km' : '/ mi';
+  const unit = '/ km';
   document.getElementById('pace-display').innerHTML =
     `Target pace: <strong>${paceMinutes}:${s} ${unit}</strong>`;
 }
@@ -1408,7 +1367,7 @@ function distName(km) {
   if (km === 10)   return '10K';
   if (km === 21.1) return 'Half Marathon';
   if (km === 42.2) return 'Marathon';
-  return useMetric ? `${km}km Race` : `${Math.round(km * KM_TO_MI * 10)/10}mi Race`;
+  return `${km}km Race`;
 }
 
 function peakKm(targetKm, currentWeeklyKm) {
@@ -1454,9 +1413,16 @@ function generatePlan() {
   const startDate      = new Date(raceDate);
   startDate.setDate(raceDate.getDate() - weeks * 7);
 
-  const easyPace  = paceSec + 75;
-  const tempoPace = paceSec + 20;
-  const longPace  = paceSec + 90;
+  const easyPace      = paceSec + 75;
+  const tempoPace     = paceSec - 30;   // threshold: 30 sec/km faster than race pace
+  const longPace      = paceSec + 90;
+  const intervalPace  = paceSec - 15;   // intervals: ~15 sec/km faster than race (5K/10K)
+
+  // Quality session type depends on race distance
+  // 5K/10K → intervals at near-race pace; half/full → sustained tempo
+  const isSpeedEvent  = targetKm <= 10;
+  const qualityType   = isSpeedEvent ? 'intervals' : 'tempo';
+  const qualityPace   = isSpeedEvent ? intervalPace : tempoPace;
   const peak      = peakKm(targetKm, currentWeeklyKm);
 
   // Base week: start from actual current load, floor at 35% of peak, never above peak
@@ -1498,17 +1464,33 @@ function generatePlan() {
       rd.setDate(rd.getDate() + off);
 
       let type, km, pace;
+
+      // Determine if this week gets a quality session
+      // - Never in taper/race weeks, never in first 2 weeks
+      // - rpw >= 3 gets one quality session, rpw >= 5 gets two
+      const hasQuality = !isRace && !isTaper && w >= 3 && rpw >= 3;
+      const hasTwoQuality = hasQuality && rpw >= 5;
+
       if (r === rpw - 1) {
         // Last slot always = long run
-        type = 'long'; km = longDist; pace = longPace;
-      } else if (rpw >= 5 && r === 1) {
-        // Tempo run for higher volume plans
-        type = 'tempo'; km = Math.round((rest / (rpw - 1)) * 0.85 * 10) / 10; pace = tempoPace;
-      } else if (rpw >= 6 && r === 3) {
-        // Second quality session for 6-7 day plans
-        type = 'tempo'; km = Math.round((rest / (rpw - 1)) * 0.8 * 10) / 10; pace = tempoPace;
+        type = 'long';
+        km   = longDist;
+        pace = longPace;
+      } else if (hasQuality && r === 1) {
+        // First quality session (slot 2): intervals for 5K/10K, tempo for longer
+        type = qualityType;
+        km   = Math.round((rest / (rpw - 1)) * 0.85 * 10) / 10;
+        pace = qualityPace;
+      } else if (hasTwoQuality && r === 3) {
+        // Second quality session (slot 4, high-volume plans only)
+        // 5K/10K gets tempo as second session; longer events get a second tempo
+        type = isSpeedEvent ? 'tempo' : 'tempo';
+        km   = Math.round((rest / (rpw - 1)) * 0.80 * 10) / 10;
+        pace = tempoPace;
       } else {
-        type = 'easy';  km = Math.round((rest / (rpw - 1)) * 10) / 10; pace = easyPace;
+        type = 'easy';
+        km   = Math.round((rest / (rpw - 1)) * 10) / 10;
+        pace = easyPace;
       }
       runs.push({ type, km, pace, date: new Date(rd) });
     }
@@ -1518,7 +1500,7 @@ function generatePlan() {
     planWeeks.push({ week: w, wkKm, runs, isTaper, isRace, isCutbk, label });
   }
 
-  planData = { targetKm, paceSec, weeks, rpw, startDate, easyPace, tempoPace, longPace, peak, planWeeks, totalKm: Math.round(totalKm) };
+  planData = { targetKm, paceSec, weeks, rpw, startDate, easyPace, tempoPace, longPace, intervalPace, qualityType, isSpeedEvent, peak, planWeeks, totalKm: Math.round(totalKm) };
   renderPlan(planData);
 }
 
@@ -1544,15 +1526,18 @@ function renderPlan(d) {
 
   document.getElementById('pace-legend').innerHTML = `
     <div class="legend-row"><div class="legend-left"><span class="run-badge b-easy">Easy</span></div><span>${fmtPace(d.easyPace)}</span></div>
-    <div class="legend-row"><div class="legend-left"><span class="run-badge b-tempo">Tempo</span></div><span>${fmtPace(d.tempoPace)}</span></div>
+    ${d.isSpeedEvent
+      ? `<div class="legend-row"><div class="legend-left"><span class="run-badge b-intervals">Intervals</span></div><span>${fmtPace(d.intervalPace)} <span style="font-size:11px;color:#666">race pace</span></span></div>`
+      : `<div class="legend-row"><div class="legend-left"><span class="run-badge b-tempo">Tempo</span></div><span>${fmtPace(d.tempoPace)}</span></div>`
+    }
     <div class="legend-row"><div class="legend-left"><span class="run-badge b-long">Long</span></div><span>${fmtPace(d.longPace)}</span></div>
     <div class="legend-row"><div class="legend-left"><span class="run-badge b-long" style="background:rgba(200,255,0,0.2)">Race</span></div><span>${fmtPace(d.paceSec)}</span></div>
   `;
 
   const weeksEl = document.getElementById('plan-weeks');
   weeksEl.innerHTML = '';
-  const typeLabels = { easy:'Easy Run', long:'Long Run', tempo:'Tempo Run' };
-  const badgeClass = { easy:'b-easy', long:'b-long', tempo:'b-tempo' };
+  const typeLabels = { easy:'Easy Run', long:'Long Run', tempo:'Tempo Run', intervals:'Intervals' };
+  const badgeClass = { easy:'b-easy', long:'b-long', tempo:'b-tempo', intervals:'b-intervals' };
 
   d.planWeeks.forEach((wk, idx) => {
     const tagCls  = wk.isRace ? 'tag-race' : wk.isTaper ? 'tag-taper' : wk.isCutbk ? 'tag-recover' : 'tag-build';
@@ -1587,13 +1572,21 @@ function renderPlan(d) {
   document.getElementById('plan-section').scrollIntoView({ behavior: 'smooth' });
 }
 
+function intervalDesc(km) {
+  // Generate a sensible interval session description based on total distance
+  if (km <= 4)  return '4–6 × 400m @ race pace';
+  if (km <= 6)  return '5–6 × 800m @ race pace';
+  if (km <= 8)  return '4–5 × 1km @ race pace';
+  return '5–6 × 1km @ race pace';
+}
+
 function renderRuns(runs, typeLabels, badgeClass) {
   return runs.map(r => `
     <div class="run-row">
       <div class="run-day">${DAYS[r.date.getDay()]} ${fmtDate(r.date)}</div>
-      <span class="run-badge ${badgeClass[r.type]}">${r.type}</span>
-      <div class="run-dist">${fmtDist(r.km)}</div>
-      <div class="run-pace">${fmtPace(r.pace)}</div>
+      <span class="run-badge ${badgeClass[r.type]}">${typeLabels[r.type] || r.type}</span>
+      <div class="run-dist">${fmtDist(r.km)}${r.type === 'intervals' ? `<span style="font-size:11px;color:#666;margin-left:6px">${intervalDesc(r.km)}</span>` : ''}</div>
+      <div class="run-pace">${fmtPace(r.pace)}/km</div>
     </div>
   `).join('');
 }
@@ -1601,8 +1594,8 @@ function renderRuns(runs, typeLabels, badgeClass) {
 // ─────────────────────────────────────────────
 // VOLUME ADJUSTMENT — per-week nudge
 // ─────────────────────────────────────────────
-const typeLabelsG = { easy:'Easy Run', long:'Long Run', tempo:'Tempo Run' };
-const badgeClassG = { easy:'b-easy', long:'b-long', tempo:'b-tempo' };
+const typeLabelsG = { easy:'Easy Run', long:'Long Run', tempo:'Tempo Run', intervals:'Intervals' };
+const badgeClassG = { easy:'b-easy', long:'b-long', tempo:'b-tempo', intervals:'b-intervals' };
 
 function nudgeWeek(idx, delta) {
   if (!planData) return;
@@ -1671,7 +1664,7 @@ function exportICal() {
     return dt.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
   }
 
-  const typeLabels = { easy: 'Easy Run', long: 'Long Run', tempo: 'Tempo Run' };
+  const typeLabels = { easy: 'Easy Run', long: 'Long Run', tempo: 'Tempo Run', intervals: 'Intervals' };
   const lines = [
     'BEGIN:VCALENDAR','VERSION:2.0',
     'PRODID:-//PaceLab//Training Plan//EN',
