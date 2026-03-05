@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary SEO -->
+  <title>PaceLab — Free Running Training Plan Generator</title>
+  <meta name="description" content="Build a personalised running training plan in 60 seconds. Choose your race, target pace, and schedule — get a week-by-week plan exportable to any calendar. Free, no account required.">
+  <meta name="keywords" content="running training plan, marathon training plan, half marathon training plan, 5k training plan, 10k training plan, free running plan generator, couch to 5k, race training">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://pacelab.app/">
+
+  <!-- Open Graph (Facebook, LinkedIn previews) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pacelab.app/">
+  <meta property="og:title" content="PaceLab — Free Running Training Plan Generator">
+  <meta property="og:description" content="Build a personalised running training plan in 60 seconds. Pick your race, your pace, your schedule. Export straight to your calendar.">
+  <meta property="og:image" content="https://pacelab.app/og-image.png">
+  <meta property="og:site_name" content="PaceLab">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PaceLab — Free Running Training Plan Generator">
+  <meta name="twitter:description" content="Build a personalised running training plan in 60 seconds. Free, no account required.">
+  <meta name="twitter:image" content="https://pacelab.app/og-image.png">
+
+  <!-- Structured Data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PaceLab",
+    "url": "https://pacelab.app",
+    "description": "Free running training plan generator. Build a personalised week-by-week plan based on your target race, pace, and schedule.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD"
+    },
+    "featureList": [
+      "Personalised running training plans",
+      "5K, 10K, half marathon and marathon plans",
+      "iCal export for Apple Calendar, Google Calendar and Outlook",
+      "Adjustable weekly volume",
+      "Pace zone calculator"
+    ]
+  }
+  </script>
+
+  <!-- Font preloading for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0c;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --surface3: #252525;
+      --border: #2a2a2a;
+      --border2: #333;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200,255,0,0.12);
+      --accent2: #ff6b35;
+      --text: #f2f2f2;
+      --text-mid: #c0c0c0;
+      --text-muted: #888;
+      --text-faint: #555;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background: #0c0c0c; }
+
+    body {
+      background: #0c0c0c !important;
+      color: #f2f2f2 !important;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .ad-leaderboard { width: 100%; height: 90px; }
+    .ad-sidebar     { width: 100%; min-height: 250px; }
+    .ad-inline      { width: 100%; height: 90px; margin: 40px 0; }
+
+    /* ── HEADER ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      border-bottom: 1px solid #2a2a2a;
+      position: sticky; top: 0;
+      background: rgba(12,12,12,0.97) !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 200;
+    }
+    .logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 26px;
+      letter-spacing: -0.01em;
+      color: #f2f2f2 !important;
+      text-decoration: none;
+    }
+    .logo span { color: #c8ff00 !important; }
+
+    /* ── BURGER BUTTON ── */
+    .burger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 40px; height: 40px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 9px 10px;
+      transition: border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .burger:hover { border-color: #555; }
+    .burger span {
+      display: block;
+      width: 100%; height: 2px;
+      background: #c0c0c0;
+      border-radius: 2px;
+      transition: all 0.25s;
+    }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── NAV DRAWER ── */
+    .nav-drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 300px; height: 100vh;
+      background: #111 !important;
+      border-left: 1px solid #2a2a2a;
+      z-index: 190;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .nav-drawer.open { transform: translateX(0); }
+    .nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 180;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .nav-overlay.open { opacity: 1; pointer-events: all; }
+    .nav-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid #2a2a2a;
+      flex-shrink: 0;
+    }
+    .nav-drawer-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 22px;
+      color: #f2f2f2 !important; text-decoration: none;
+    }
+    .nav-drawer-logo span { color: #c8ff00 !important; }
+    .nav-close {
+      background: #1e1e1e; border: 1px solid #333; border-radius: 6px;
+      color: #888; font-size: 14px; padding: 5px 10px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    }
+    .nav-close:hover { color: #f2f2f2; border-color: #555; }
+    .nav-section {
+      padding: 20px 24px 8px;
+    }
+    .nav-section-label {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #555 !important; font-weight: 700; margin-bottom: 10px;
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 12px; border-radius: 8px;
+      text-decoration: none; color: #c0c0c0 !important;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.15s; margin-bottom: 2px;
+    }
+    .nav-link:hover { background: #1e1e1e; color: #f2f2f2 !important; }
+    .nav-link .nav-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+    .nav-link.active { background: rgba(200,255,0,0.08); color: #c8ff00 !important; }
+    .nav-divider { height: 1px; background: #2a2a2a; margin: 8px 24px; }
+
+    /* ── TOP AD ── */
+    .top-ad-wrap {
+      padding: 12px 48px;
+      background: #161616 !important;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    /* ── AD SLOTS ── */
+    .ad-slot {
+      background: #1e1e1e !important;
+      border: 1px dashed #2e2e2e;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #444 !important;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── MAIN ── */
+    main { max-width: 1140px; margin: 0 auto; padding: 0 24px 100px; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 72px 0 56px;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(200,255,0,0.1) !important;
+      border: 1px solid rgba(200,255,0,0.2);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: #c8ff00 !important;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero-pill::before { content: '●'; font-size: 8px; }
+    .hero h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(60px, 9vw, 108px);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      color: #f2f2f2 !important;
+    }
+    .hero h1 em { font-style: italic; color: #c8ff00 !important; }
+    .hero-desc {
+      font-size: 17px;
+      color: #b0b0b0 !important;
+      max-width: 500px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+    .hero-divider {
+      width: 48px;
+      height: 3px;
+      background: var(--accent);
+      margin: 32px 0;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: #161616 !important;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 48px;
+    }
+    .form-section-label {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px 36px;
+      margin-bottom: 36px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 10px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #c0c0c0 !important;
+      font-weight: 600;
+    }
+
+    select, input[type="date"] {
+      background: #1e1e1e !important;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #f2f2f2 !important;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    select:focus, input:focus { border-color: #c8ff00; }
+    select option { background: #1e1e1e !important; color: #f2f2f2 !important; }
+
+    /* ── RADIO CHIPS ── */
+    .chip-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      flex: 1;
+      min-width: 56px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 13px 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.15s;
+      background: #1e1e1e !important;
+      color: #c0c0c0 !important;
+      user-select: none;
+    }
+    .chip:hover { border-color: #555; color: #f2f2f2 !important; }
+    .chip.active {
+      border-color: #c8ff00;
+      background: rgba(200,255,0,0.1) !important;
+      color: #c8ff00 !important;
+    }
+
+    /* ── PACE WHEEL ── */
+    .pace-wheel-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      overflow: hidden;
+      height: 52px;
+      position: relative;
+    }
+    .pace-wheel-wrap:focus-within { border-color: var(--accent); }
+    .wheel-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      height: 100%;
+    }
+    .wheel-col + .wheel-col {
+      border-left: 1px solid var(--border);
+    }
+    .wheel-divider {
+      width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-mid);
+      flex-shrink: 0;
+      background: var(--surface2);
+      height: 100%;
+      border-top: none;
+      border-bottom: none;
+    }
+    .wheel-label-top {
+      font-size: 10px;
+      color: var(--text-faint);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      pointer-events: none;
+      padding-top: 4px;
+    }
+    .wheel-inner {
+      flex: 1;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      scrollbar-width: none;
+    }
+    .wheel-inner::-webkit-scrollbar { display: none; }
+    .wheel-item {
+      scroll-snap-align: center;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--text);
+      width: 100%;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.1s;
+    }
+    .wheel-item.selected { color: var(--accent); }
+
+    /* New styled scroll wheel */
+    .pace-picker {
+      background: #1e1e1e !important;
+      border: 1px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      height: 130px;
+      position: relative;
+    }
+    .pace-picker:focus-within { border-color: #c8ff00; }
+    .pace-picker::before,
+    .pace-picker::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 38px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .pace-picker::before {
+      top: 0;
+      background: linear-gradient(to bottom, #1e1e1e, transparent);
+    }
+    .pace-picker::after {
+      bottom: 0;
+      background: linear-gradient(to top, #1e1e1e, transparent);
+    }
+    .pace-selector-line {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      transform: translateY(-50%);
+      height: 40px;
+      background: rgba(200,255,0,0.07);
+      border-top: 1px solid rgba(200,255,0,0.2);
+      border-bottom: 1px solid rgba(200,255,0,0.2);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .pace-col {
+      flex: 1;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pace-col::-webkit-scrollbar { display: none; }
+    .pace-col + .pace-col { border-left: 1px solid var(--border); }
+    .pace-spacer { height: 45px; width: 100%; flex-shrink: 0; }
+    .pace-opt {
+      scroll-snap-align: center;
+      height: 40px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #666 !important;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.15s;
+      user-select: none;
+    }
+    .pace-opt.active { color: #c8ff00 !important; }
+    .pace-col-header {
+      font-size: 11px;
+      color: #555 !important;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .pace-col-sep {
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: #c0c0c0 !important;
+      flex-shrink: 0;
+      background: #1e1e1e !important;
+      z-index: 3;
+    }
+    .pace-display {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #888 !important;
+      text-align: center;
+    }
+    .pace-display strong { color: #c8ff00 !important; font-size: 16px; }
+
+    .units-toggle {
+      display: flex;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .unit-btn {
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.06em;
+      background: transparent;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .unit-btn.active {
+      background: #c8ff00;
+      color: #000;
+    }
+    .unit-btn:not(.active):hover { color: #c0c0c0; }
+
+    .finish-chip {
+      border-color: rgba(200,255,0,0.25) !important;
+      background: rgba(200,255,0,0.06) !important;
+    }
+    .finish-chip strong { color: #c8ff00 !important; }
+
+    .start-date-hint {
+      font-size: 13px;
+      color: #888;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+    .start-date-hint strong { color: #c8ff00; }
+
+    /* ── GENERATE BTN ── */
+    .generate-btn {
+      width: 100%;
+      padding: 20px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .generate-btn:hover { background: #d4ff1a; transform: translateY(-1px); }
+    .generate-btn:active { transform: translateY(0); }
+
+    /* ── PLAN HEADER ── */
+    #plan-section { display: none; }
+    .plan-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 56px 0 36px;
+      flex-wrap: wrap;
+    }
+    .plan-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .plan-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 52px;
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .plan-chips {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    .plan-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      color: var(--text-mid);
+    }
+    .plan-chip strong { color: var(--text); }
+    .export-block { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+    .export-btns { display: flex; gap: 10px; }
+    .btn {
+      padding: 14px 22px;
+      border-radius: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #d4ff1a; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-mid);
+      border: 1px solid var(--border2);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: #444; }
+    .export-note {
+      font-size: 12px;
+      color: var(--text-faint);
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    /* ── PLAN LAYOUT ── */
+    .plan-body {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+    .plan-main { flex: 1; min-width: 0; }
+    .plan-sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── WEEK CARDS ── */
+    .week-card {
+      background: #161616 !important;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .week-card.taper { border-color: rgba(255,107,53,0.25); }
+    .week-card.race-week { border-color: rgba(200,255,0,0.35); }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      background: #1e1e1e !important;
+      cursor: pointer;
+      user-select: none;
+    }
+    .week-header:hover { background: #252525 !important; }
+    .week-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 19px;
+      text-transform: uppercase;
+      color: #f2f2f2 !important;
+    }
+    .week-tag {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 3px;
+      font-weight: 700;
+      margin-left: 12px;
+    }
+    .tag-build  { background: rgba(255,255,255,0.07); color: #888; }
+    .tag-recover{ background: rgba(100,180,255,0.12); color: #64b4ff; }
+    .tag-taper  { background: rgba(255,107,53,0.14); color: #ff6b35; }
+    .tag-race   { background: rgba(200,255,0,0.1); color: #c8ff00; }
+
+    .week-km {
+      font-size: 14px;
+      color: #c0c0c0 !important;
+    }
+    .week-km strong { color: #f2f2f2 !important; font-size: 16px; }
+    .chevron { color: #555 !important; font-size: 16px; margin-left: 14px; transition: transform 0.2s; }
+    .week-card.open .chevron { transform: rotate(180deg); }
+
+    .week-runs { display: none; }
+    .week-card.open .week-runs { display: block; }
+
+    .run-row {
+      display: grid;
+      grid-template-columns: 150px 74px 100px 1fr;
+      gap: 12px;
+      padding: 13px 22px;
+      border-top: 1px solid #2a2a2a;
+      align-items: center;
+    }
+    .run-row:hover { background: rgba(255,255,255,0.02); }
+    .run-day { font-size: 13px; color: #c0c0c0 !important; }
+    .run-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    .b-easy  { background: rgba(100,200,255,0.12); color: #6ec8f5; }
+    .b-long  { background: rgba(200,255,0,0.1); color: #c8ff00; }
+    .b-tempo { background: rgba(255,107,53,0.14); color: #ff6b35; }
+    .b-rest  { background: rgba(255,255,255,0.05); color: #555; }
+    .run-dist {
+      font-weight: 700;
+      font-size: 16px;
+      color: #f2f2f2 !important;
+    }
+    .run-pace { font-size: 13px; color: #888 !important; }
+
+    /* ── SIDEBAR WIDGETS ── */
+    .widget {
+      background: #161616 !important;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 22px;
+    }
+    .widget-title {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555 !important;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .stats-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-box {
+      background: #1e1e1e !important;
+      border-radius: 8px;
+      padding: 16px 12px;
+      text-align: center;
+    }
+    .stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 30px;
+      color: #c8ff00 !important;
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #888 !important;
+      margin-top: 5px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid #2a2a2a;
+      font-size: 13px;
+      color: #c0c0c0 !important;
+    }
+    .legend-row:last-child { border-bottom: none; }
+    .legend-left { display: flex; align-items: center; gap: 10px; }
+
+    /* ── PLAN OUTPUT remaining ── */
+    .plan-eyebrow { color: #c8ff00 !important; }
+    .plan-title { color: #f2f2f2 !important; }
+    .plan-chip { background: #1e1e1e !important; border: 1px solid #333; color: #c0c0c0 !important; }
+    .plan-chip strong { color: #f2f2f2 !important; }
+    .btn-primary { background: #c8ff00 !important; color: #000 !important; }
+    .btn-ghost { background: transparent !important; color: #c0c0c0 !important; border: 1px solid #333; }
+    .btn-ghost:hover { color: #f2f2f2 !important; }
+    .export-note { color: #555 !important; }
+
+    /* ── FOOTER ── */
+    .week-nudge-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nudge-btn {
+      background: #252525;
+      border: 1px solid #333;
+      border-radius: 5px;
+      color: #888;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1;
+    }
+    .nudge-btn:hover { border-color: #c8ff00; color: #c8ff00; background: rgba(200,255,0,0.07); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid #2a2a2a;
+      padding: 32px 48px;
+      text-align: center;
+      color: #555 !important;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 800px) {
+      .site-header { padding: 16px 20px; }
+      .top-ad-wrap { padding: 12px 20px; }
+      main { padding: 0 16px 60px; }
+      .form-card { padding: 24px 20px; }
+      .form-grid { grid-template-columns: 1fr; gap: 24px; }
+      .plan-body { flex-direction: column; }
+      .plan-sidebar { width: 100%; }
+      .plan-header { flex-direction: column; }
+      .export-block { align-items: flex-start; }
+      .run-row { grid-template-columns: 1fr 1fr; row-gap: 6px; }
+      .run-row .run-pace { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="nav-overlay" id="nav-overlay" onclick="closeNav()"></div>
+
+<nav class="nav-drawer" id="nav-drawer">
+  <div class="nav-drawer-header">
+    <a href="/" class="nav-drawer-logo">Pace<span>Lab</span></a>
+    <button class="nav-close" onclick="closeNav()">✕</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Tools</div>
+    <a href="/" class="nav-link active"><span class="nav-icon">⚡</span>Training Plan Generator</a>
+    <a href="/pace-calculator" class="nav-link"><span class="nav-icon">⏱</span>Pace Calculator</a>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Training Guides</div>
+    <a href="/parkrun-training-guide" class="nav-link"><span class="nav-icon">🏃</span>Parkrun Guide</a>
+    <a href="/5k-training-guide" class="nav-link"><span class="nav-icon">5K</span>5K Training Guide</a>
+    <a href="/10k-training-guide" class="nav-link"><span class="nav-icon">10K</span>10K Training Guide</a>
+    <a href="/half-marathon-training-guide" class="nav-link"><span class="nav-icon">½</span>Half Marathon Guide</a>
+    <a href="/marathon-training-guide" class="nav-link"><span class="nav-icon">🏅</span>Marathon Guide</a>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Race Plans</div>
+    <a href="/parkrun-training-guide" class="nav-link"><span class="nav-icon">📍</span>Parkrun</a>
+    <a href="/city2surf" class="nav-link"><span class="nav-icon">📍</span>City2Surf Sydney</a>
+    <a href="/bridge-to-brisbane" class="nav-link"><span class="nav-icon">📍</span>Bridge to Brisbane</a>
+    <a href="/gold-coast-marathon" class="nav-link"><span class="nav-icon">📍</span>Gold Coast Marathon</a>
+    <a href="/sydney-marathon" class="nav-link"><span class="nav-icon">📍</span>Sydney Marathon</a>
+    <a href="/melbourne-marathon" class="nav-link"><span class="nav-icon">📍</span>Melbourne Marathon</a>
+  </div>
+</nav>
+
+<header class="site-header">
+  <a href="/" class="logo">Pace<span>Lab</span></a>
+  <button class="burger" id="burger-btn" onclick="toggleNav()" aria-label="Open navigation">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- TOP AD -->
+<div class="top-ad-wrap">
+  <div class="ad-slot ad-leaderboard"><!-- REPLACE: Google AdSense 728×90 --></div>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-pill">Free · No account required</div>
+    <h1>Train<br>smarter.<br><em>Race faster.</em></h1>
+    <div class="hero-divider"></div>
+    <p class="hero-desc">Enter your goal, your pace, and your schedule. Get a structured week-by-week training plan — exportable straight to your calendar.</p>
+  </section>
+
+  <!-- FORM -->
+  <div class="form-card" id="form-section">
+    <div class="form-section-label">Build Your Plan</div>
+    <div class="form-grid">
+
+      <!-- Distance -->
+      <div class="form-group">
+        <label>Target Race Distance</label>
+        <select id="distance">
+          <option value="5">5K</option>
+          <option value="10">10K</option>
+          <option value="21.1" selected>Half Marathon — 21.1km</option>
+          <option value="42.2">Marathon — 42.2km</option>
+          <option value="custom">Custom Distance</option>
+        </select>
+      </div>
+
+      <!-- Custom Distance -->
+      <div class="form-group" id="custom-dist-wrap" style="display:none">
+        <label id="custom-dist-label">Custom Distance (km)</label>
+        <input type="number" id="custom-distance" min="1" max="200" value="30"
+          style="background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#f2f2f2;font-family:'DM Sans',sans-serif;font-size:16px;padding:14px 18px;outline:none;width:100%;">
+      </div>
+
+      <!-- Fitness Level -->
+      <div class="form-group">
+        <label>Current Fitness Level</label>
+        <select id="fitness-level">
+          <option value="beginner">Beginner — just getting started</option>
+          <option value="occasional">Occasional — running a few times a month</option>
+          <option value="regular" selected>Regular — running most weeks</option>
+        </select>
+      </div>
+
+      <!-- Race Day -->
+      <div class="form-group">
+        <label>Race Day</label>
+        <input type="date" id="race-date">
+      </div>
+
+      <!-- Training Length -->
+      <div class="form-group">
+        <label>Training Length</label>
+        <div class="pace-picker" id="weeks-picker">
+          <div class="pace-selector-line"></div>
+          <div class="pace-col" id="weeks-col"></div>
+        </div>
+        <div class="pace-display" id="weeks-display">Length: <strong>12 weeks</strong></div>
+        <div class="start-date-hint" id="start-date-hint"></div>
+      </div>
+
+      <!-- Runs Per Week -->
+      <div class="form-group">
+        <label>Runs Per Week</label>
+        <div class="pace-picker" id="runs-picker">
+          <div class="pace-selector-line"></div>
+          <div class="pace-col" id="runs-col"></div>
+        </div>
+        <div class="pace-display" id="runs-display">Frequency: <strong>4 days / week</strong></div>
+      </div>
+
+      <!-- Pace Wheel -->
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+          <label id="pace-label">Target Race Pace</label>
+          <div class="units-toggle">
+            <button class="unit-btn active" id="btn-km" onclick="setUnits('km')">km</button>
+            <button class="unit-btn" id="btn-mi" onclick="setUnits('mi')">mi</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="flex:1">
+            <span class="pace-col-header">Minutes</span>
+            <div class="pace-picker" id="min-picker">
+              <div class="pace-selector-line"></div>
+              <div class="pace-col" id="min-col"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;padding-top:36px;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:#c0c0c0">:</div>
+          <div style="flex:1">
+            <span class="pace-col-header">Seconds</span>
+            <div class="pace-picker" id="sec-picker">
+              <div class="pace-selector-line"></div>
+              <div class="pace-col" id="sec-col"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;padding-top:36px;font-size:13px;color:#888" id="pace-unit-label">/ km</div>
+        </div>
+        <div class="pace-display" id="pace-display">Target pace: <strong>5:30 / km</strong></div>
+      </div>
+
+    </div>
+
+    <button class="generate-btn" onclick="generatePlan()">⚡ Generate My Plan</button>
+  </div>
+
+  <!-- INLINE AD -->
+  <div class="ad-slot ad-inline"><!-- REPLACE: Google AdSense in-content --></div>
+
+  <!-- PLAN OUTPUT -->
+  <div id="plan-section">
+
+    <div class="plan-header">
+      <div>
+        <div class="plan-eyebrow">Your Training Plan</div>
+        <div class="plan-title" id="plan-title">—</div>
+        <div class="plan-chips" id="plan-chips"></div>
+      </div>
+      <div class="export-block">
+        <div class="export-btns">
+          <button class="btn btn-primary" onclick="exportICal()">⬇ Download iCal</button>
+          <button class="btn btn-ghost" onclick="resetPlan()">← Edit</button>
+        </div>
+        <div class="export-note">
+          Works with Apple Calendar, Google Calendar &amp; Outlook.
+        </div>
+      </div>
+    </div>
+
+    <div class="plan-body">
+      <div class="plan-main" id="plan-weeks"></div>
+      <div class="plan-sidebar">
+
+        <!-- Stats -->
+        <div class="widget">
+          <div class="widget-title">Plan Overview</div>
+          <div class="stats-2col" id="plan-stats"></div>
+        </div>
+
+        <!-- Pace Legend -->
+        <div class="widget">
+          <div class="widget-title">Your Pace Zones</div>
+          <div id="pace-legend"></div>
+        </div>
+
+        <!-- Sidebar Ad -->
+        <div class="ad-slot ad-sidebar"><!-- REPLACE: Google AdSense 300×250 --></div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+
+</main>
+
+<!-- GUIDES SECTION -->
+<section style="background:#111;border-top:1px solid #2a2a2a;padding:64px 24px;">
+  <div style="max-width:1140px;margin:0 auto;">
+    <p style="font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#c8ff00;font-weight:700;margin-bottom:14px;">Training Guides & Resources</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(32px,5vw,52px);text-transform:uppercase;color:#f2f2f2;letter-spacing:-0.01em;margin-bottom:40px;line-height:1;">Everything You Need<br><em style="font-style:italic;color:#c8ff00;">to Run Further & Faster</em></h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;">
+
+      <a href="/marathon-training-guide" style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#444'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div style="font-size:24px;margin-bottom:10px;">🏅</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:#f2f2f2;margin-bottom:6px;">Marathon Guide</div>
+        <div style="font-size:13px;color:#666;line-height:1.5;">42.2km · 16–20 week plans · Long runs, taper & fuelling</div>
+      </a>
+
+      <a href="/half-marathon-training-guide" style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#444'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div style="font-size:24px;margin-bottom:10px;">½</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:#f2f2f2;margin-bottom:6px;">Half Marathon Guide</div>
+        <div style="font-size:13px;color:#666;line-height:1.5;">21.1km · 10–16 week plans · Pace zones & race strategy</div>
+      </a>
+
+      <a href="/10k-training-guide" style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#444'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div style="font-size:24px;margin-bottom:10px;">🏃</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:#f2f2f2;margin-bottom:6px;">10K Training Guide</div>
+        <div style="font-size:13px;color:#666;line-height:1.5;">10km · 8–12 week plans · Tempo runs & intervals</div>
+      </a>
+
+      <a href="/5k-training-guide" style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#444'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div style="font-size:24px;margin-bottom:10px;">⚡</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:#f2f2f2;margin-bottom:6px;">5K Training Guide</div>
+        <div style="font-size:13px;color:#666;line-height:1.5;">5km · 6–10 week plans · Sub-30, sub-25 & sub-20</div>
+      </a>
+
+      <a href="/parkrun-training-guide" style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#444'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div style="font-size:24px;margin-bottom:10px;">📍</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:#f2f2f2;margin-bottom:6px;">Parkrun Guide</div>
+        <div style="font-size:13px;color:#666;line-height:1.5;">Free · Every Saturday · How to actually get faster</div>
+      </a>
+
+      <a href="/pace-calculator" style="background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-decoration:none;display:block;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#444'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div style="font-size:24px;margin-bottom:10px;">⏱</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:#f2f2f2;margin-bottom:6px;">Pace Calculator</div>
+        <div style="font-size:13px;color:#666;line-height:1.5;">Finish times · Required pace · Full split breakdowns</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong style="color:#c0c0c0">PaceLab</strong> · <a href="/marathon-training-guide" style="color:#c8ff00;text-decoration:none;">Marathon Guide</a> · <a href="/half-marathon-training-guide" style="color:#c8ff00;text-decoration:none;">Half Marathon Guide</a> · <a href="/pace-calculator" style="color:#c8ff00;text-decoration:none;">Pace Calculator</a></p>
+  <p style="margin-top:8px;">Plans follow established progressive overload principles. Always consult a doctor before starting a new training programme.</p>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let selectedWeeks = 12;
+let selectedRuns  = 4;
+let planData      = null;
+let paceMinutes   = 5;
+let paceSeconds   = 30;
+let useMetric     = true; // km vs miles
+
+const KM_TO_MI = 0.621371;
+
+function fmtDist(km) {
+  if (useMetric) return `${Math.round(km * 10) / 10}km`;
+  return `${Math.round(km * KM_TO_MI * 10) / 10}mi`;
+}
+
+function fmtPace(secPerKm) {
+  // pace is always stored as sec/km internally; display converts if miles
+  const sec = useMetric ? secPerKm : secPerKm * KM_TO_MI;
+  const m = Math.floor(sec / 60);
+  const s = Math.round(sec % 60);
+  const unit = useMetric ? '/km' : '/mi';
+  return `${m}:${s.toString().padStart(2,'0')}${unit}`;
+}
+
+function projectedFinish(targetKm, paceSec) {
+  const totalSec = targetKm * paceSec;
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = Math.round(totalSec % 60);
+  if (h > 0) return `${h}h ${m}m ${s.toString().padStart(2,'0')}s`;
+  return `${m}m ${s.toString().padStart(2,'0')}s`;
+}
+
+function setUnits(unit) {
+  useMetric = unit === 'km';
+  document.getElementById('btn-km').classList.toggle('active', useMetric);
+  document.getElementById('btn-mi').classList.toggle('active', !useMetric);
+  document.getElementById('pace-unit-label').textContent = useMetric ? '/ km' : '/ mi';
+  document.getElementById('custom-dist-label').textContent = useMetric ? 'Custom Distance (km)' : 'Custom Distance (mi)';
+  updatePaceDisplay();
+  if (planData) renderPlan(planData);
+}
+
+const FITNESS_BASE = {
+  beginner:   0.30,
+  occasional: 0.38,
+  regular:    0.48
+};
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Default race date → 12 weeks from next Monday
+  const raceInput = document.getElementById('race-date');
+  const today = new Date();
+  raceInput.value = today.toISOString().split('T')[0];
+  raceInput.addEventListener('change', updateStartDateHint);
+
+  buildWheel('weeks-col', 4, 24, selectedWeeks, v => {
+    selectedWeeks = v;
+    document.getElementById('weeks-display').innerHTML =
+      `Length: <strong>${v} week${v === 1 ? '' : 's'}</strong>`;
+    updateStartDateHint();
+  });
+
+  buildWheel('runs-col', 2, 7, selectedRuns, v => {
+    selectedRuns = v;
+    document.getElementById('runs-display').innerHTML =
+      `Frequency: <strong>${v} day${v === 1 ? '' : 's'} / week</strong>`;
+  });
+
+  document.getElementById('distance').addEventListener('change', function() {
+    document.getElementById('custom-dist-wrap').style.display =
+      this.value === 'custom' ? 'flex' : 'none';
+  });
+
+  buildPaceWheels();
+  updateStartDateHint();
+});
+
+function setupChipGroup(id, cb) {
+  const g = document.getElementById(id);
+  g.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      g.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      cb(c.dataset.val);
+    });
+  });
+}
+
+function updateStartDateHint() {
+  const raceVal = document.getElementById('race-date').value;
+  const hint    = document.getElementById('start-date-hint');
+  if (!raceVal) { hint.textContent = ''; return; }
+
+  const raceDate  = new Date(raceVal);
+  const startDate = new Date(raceDate);
+  startDate.setDate(raceDate.getDate() - selectedWeeks * 7);
+
+  const opts = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+  hint.innerHTML = `▸ Training starts <strong>${startDate.toLocaleDateString('en-AU', opts)}</strong>`;
+}
+
+// ─────────────────────────────────────────────
+// PACE WHEELS
+// ─────────────────────────────────────────────
+function buildPaceWheels() {
+  buildWheel('min-col', 3, 12, paceMinutes, v => {
+    paceMinutes = v;
+    updatePaceDisplay();
+  });
+  buildWheel('sec-col', 0, 59, paceSeconds, v => {
+    paceSeconds = v;
+    updatePaceDisplay();
+  }, true); // seconds: steps of 5
+}
+
+function buildWheel(colId, min, max, defaultVal, onChange, byFive = false) {
+  const col = document.getElementById(colId);
+  col.innerHTML = '';
+
+  // Determine label format based on which wheel this is
+  const isWeeks = colId === 'weeks-col';
+  const isRuns  = colId === 'runs-col';
+
+  const spacer1 = document.createElement('div');
+  spacer1.className = 'pace-spacer';
+  col.appendChild(spacer1);
+
+  const values = [];
+  const step = byFive ? 5 : 1;
+  for (let i = min; i <= max; i += step) values.push(i);
+
+  values.forEach(val => {
+    const el = document.createElement('div');
+    el.className = 'pace-opt';
+    if (isWeeks) {
+      el.textContent = `${val}w`;
+      el.style.fontSize = '22px';
+    } else if (isRuns) {
+      el.textContent = `${val}×`;
+      el.style.fontSize = '22px';
+    } else {
+      el.textContent = val.toString().padStart(2, '0');
+    }
+    if (val === defaultVal) el.classList.add('active');
+    col.appendChild(el);
+  });
+
+  const spacer2 = document.createElement('div');
+  spacer2.className = 'pace-spacer';
+  col.appendChild(spacer2);
+
+  // Scroll to default
+  const defaultIdx = values.indexOf(defaultVal);
+  if (defaultIdx >= 0) {
+    setTimeout(() => { col.scrollTop = defaultIdx * 40; }, 50);
+  }
+
+  // Snap handler
+  let scrollTimer;
+  col.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const idx = Math.round(col.scrollTop / 40);
+      const clampedIdx = Math.max(0, Math.min(idx, values.length - 1));
+      const snappedVal = values[clampedIdx];
+
+      // Update active state
+      col.querySelectorAll('.pace-opt').forEach((el, i) => {
+        el.classList.toggle('active', i === clampedIdx);
+      });
+
+      onChange(snappedVal);
+      // Snap scroll
+      col.scrollTo({ top: clampedIdx * 40, behavior: 'smooth' });
+    }, 80);
+  });
+
+  // Click to select
+  col.querySelectorAll('.pace-opt').forEach((el, i) => {
+    el.addEventListener('click', () => {
+      col.scrollTo({ top: i * 40, behavior: 'smooth' });
+    });
+  });
+}
+
+function updatePaceDisplay() {
+  const s = paceSeconds.toString().padStart(2, '0');
+  const unit = useMetric ? '/ km' : '/ mi';
+  document.getElementById('pace-display').innerHTML =
+    `Target pace: <strong>${paceMinutes}:${s} ${unit}</strong>`;
+}
+
+// ─────────────────────────────────────────────
+// PLAN GENERATION
+// ─────────────────────────────────────────────
+function getTargetKm() {
+  const v = document.getElementById('distance').value;
+  if (v === 'custom') return parseFloat(document.getElementById('custom-distance').value) || 10;
+  return parseFloat(v);
+}
+
+function getPaceSec() { return paceMinutes * 60 + paceSeconds; }
+
+function distName(km) {
+  if (km === 5)    return '5K';
+  if (km === 10)   return '10K';
+  if (km === 21.1) return 'Half Marathon';
+  if (km === 42.2) return 'Marathon';
+  return useMetric ? `${km}km Race` : `${Math.round(km * KM_TO_MI * 10)/10}mi Race`;
+}
+
+function peakKm(targetKm) {
+  if (targetKm <= 5)    return 35;
+  if (targetKm <= 10)   return 50;
+  if (targetKm <= 21.1) return 65;
+  return 80;
+}
+
+const SCHEDULES = {
+  2: [3, 6],              // Wed, Sat
+  3: [1, 3, 6],           // Mon, Wed, Sat
+  4: [1, 3, 5, 0],        // Mon, Wed, Fri, Sun
+  5: [1, 2, 4, 5, 0],     // Mon, Tue, Thu, Fri, Sun
+  6: [1, 2, 3, 4, 6, 0],  // Mon-Thu, Sat, Sun
+  7: [0, 1, 2, 3, 4, 5, 6] // Every day
+};
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function generatePlan() {
+  const targetKm  = getTargetKm();
+  const paceSec   = getPaceSec();
+  const weeks     = selectedWeeks;
+  const rpw       = selectedRuns;
+  const fitness   = document.getElementById('fitness-level').value;
+  const raceDate  = new Date(document.getElementById('race-date').value);
+  const startDate = new Date(raceDate);
+  startDate.setDate(raceDate.getDate() - weeks * 7);
+
+  const easyPace  = paceSec + 75;
+  const tempoPace = paceSec + 20;
+  const longPace  = paceSec + 90;
+  const peak      = peakKm(targetKm);
+  const basePct   = FITNESS_BASE[fitness] || 0.40;
+  const base      = peak * basePct;
+  const sched     = SCHEDULES[rpw];
+  const planWeeks = [];
+  let totalKm     = 0;
+
+  for (let w = 1; w <= weeks; w++) {
+    const isRace   = w === weeks;
+    const isTaper  = w === weeks - 1;
+    const isCutbk  = !isTaper && !isRace && w % 4 === 0;
+
+    let wkKm;
+    if (isRace)      wkKm = peak * 0.45;
+    else if (isTaper) wkKm = peak * 0.65;
+    else {
+      const p = (w - 1) / Math.max(weeks - 3, 1);
+      wkKm = base + (peak - base) * Math.min(p, 1);
+      if (isCutbk) wkKm *= 0.78;
+    }
+    wkKm = Math.round(wkKm * 10) / 10;
+
+    const longPct = rpw >= 5 ? 0.35 : rpw === 4 ? 0.38 : rpw === 3 ? 0.42 : 0.48;
+    const longDist = Math.round(wkKm * longPct * 10) / 10;
+    const rest     = wkKm - longDist;
+
+    const runs = [];
+    for (let r = 0; r < rpw; r++) {
+      const dow = sched[r];
+      const rd  = new Date(startDate);
+      rd.setDate(startDate.getDate() + (w - 1) * 7);
+      let off = dow - rd.getDay();
+      if (off < 0) off += 7;
+      rd.setDate(rd.getDate() + off);
+
+      let type, km, pace;
+      if (r === rpw - 1) {
+        // Last slot always = long run
+        type = 'long'; km = longDist; pace = longPace;
+      } else if (rpw >= 5 && r === 1) {
+        // Tempo run for higher volume plans
+        type = 'tempo'; km = Math.round((rest / (rpw - 1)) * 0.85 * 10) / 10; pace = tempoPace;
+      } else if (rpw >= 6 && r === 3) {
+        // Second quality session for 6-7 day plans
+        type = 'tempo'; km = Math.round((rest / (rpw - 1)) * 0.8 * 10) / 10; pace = tempoPace;
+      } else {
+        type = 'easy';  km = Math.round((rest / (rpw - 1)) * 10) / 10; pace = easyPace;
+      }
+      runs.push({ type, km, pace, date: new Date(rd) });
+    }
+
+    totalKm += wkKm;
+    const label = isRace ? 'Race Week' : isTaper ? 'Taper' : isCutbk ? 'Recovery' : 'Build';
+    planWeeks.push({ week: w, wkKm, runs, isTaper, isRace, isCutbk, label });
+  }
+
+  planData = { targetKm, paceSec, weeks, rpw, startDate, easyPace, tempoPace, longPace, peak, planWeeks, totalKm: Math.round(totalKm) };
+  renderPlan(planData);
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderPlan(d) {
+  document.getElementById('plan-title').textContent = `${distName(d.targetKm)} · ${d.weeks}-Week Plan`;
+
+  document.getElementById('plan-chips').innerHTML = `
+    <div class="plan-chip">Target pace <strong>${fmtPace(d.paceSec)}</strong></div>
+    <div class="plan-chip">Runs/week <strong>${d.rpw}</strong></div>
+    <div class="plan-chip">Peak week <strong>${fmtDist(d.peak)}</strong></div>
+    <div class="plan-chip finish-chip">🏁 Projected finish <strong>${projectedFinish(d.targetKm, d.paceSec)}</strong></div>
+  `;
+
+  document.getElementById('plan-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-val">${d.weeks}</div><div class="stat-lbl">Weeks</div></div>
+    <div class="stat-box"><div class="stat-val">${fmtDist(d.totalKm)}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-box"><div class="stat-val">${d.weeks * d.rpw}</div><div class="stat-lbl">Runs</div></div>
+    <div class="stat-box"><div class="stat-val">${fmtDist(d.peak)}</div><div class="stat-lbl">Peak Wk</div></div>
+  `;
+
+  document.getElementById('pace-legend').innerHTML = `
+    <div class="legend-row"><div class="legend-left"><span class="run-badge b-easy">Easy</span></div><span>${fmtPace(d.easyPace)}</span></div>
+    <div class="legend-row"><div class="legend-left"><span class="run-badge b-tempo">Tempo</span></div><span>${fmtPace(d.tempoPace)}</span></div>
+    <div class="legend-row"><div class="legend-left"><span class="run-badge b-long">Long</span></div><span>${fmtPace(d.longPace)}</span></div>
+    <div class="legend-row"><div class="legend-left"><span class="run-badge b-long" style="background:rgba(200,255,0,0.2)">Race</span></div><span>${fmtPace(d.paceSec)}</span></div>
+  `;
+
+  const weeksEl = document.getElementById('plan-weeks');
+  weeksEl.innerHTML = '';
+  const typeLabels = { easy:'Easy Run', long:'Long Run', tempo:'Tempo Run' };
+  const badgeClass = { easy:'b-easy', long:'b-long', tempo:'b-tempo' };
+
+  d.planWeeks.forEach((wk, idx) => {
+    const tagCls  = wk.isRace ? 'tag-race' : wk.isTaper ? 'tag-taper' : wk.isCutbk ? 'tag-recover' : 'tag-build';
+    const cardCls = wk.isRace ? ' race-week' : wk.isTaper ? ' taper' : '';
+    const card    = document.createElement('div');
+    card.className = `week-card${cardCls}${idx < 2 ? ' open' : ''}`;
+    card.dataset.weekIdx = idx;
+    card.innerHTML = `
+      <div class="week-header" onclick="this.closest('.week-card').classList.toggle('open')">
+        <div style="display:flex;align-items:center">
+          <span class="week-num">Week ${wk.week}</span>
+          <span class="week-tag ${tagCls}">${wk.label}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="week-nudge-group" onclick="event.stopPropagation()">
+            <button class="nudge-btn" onclick="nudgeWeek(${idx}, -1)">−1km</button>
+            <span class="week-km" id="wk-km-${idx}"><strong>${fmtDist(wk.wkKm)}</strong></span>
+            <button class="nudge-btn" onclick="nudgeWeek(${idx}, 1)">+1km</button>
+          </div>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="week-runs" id="wk-runs-${idx}">
+        ${renderRuns(wk.runs, typeLabels, badgeClass)}
+      </div>
+    `;
+    weeksEl.appendChild(card);
+  });
+
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('plan-section').style.display = 'block';
+  document.getElementById('plan-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderRuns(runs, typeLabels, badgeClass) {
+  return runs.map(r => `
+    <div class="run-row">
+      <div class="run-day">${DAYS[r.date.getDay()]} ${fmtDate(r.date)}</div>
+      <span class="run-badge ${badgeClass[r.type]}">${r.type}</span>
+      <div class="run-dist">${fmtDist(r.km)}</div>
+      <div class="run-pace">${fmtPace(r.pace)}</div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// VOLUME ADJUSTMENT — per-week nudge
+// ─────────────────────────────────────────────
+const typeLabelsG = { easy:'Easy Run', long:'Long Run', tempo:'Tempo Run' };
+const badgeClassG = { easy:'b-easy', long:'b-long', tempo:'b-tempo' };
+
+function nudgeWeek(idx, delta) {
+  if (!planData) return;
+  const wk = planData.planWeeks[idx];
+  wk.wkKm = Math.max(1, Math.round((wk.wkKm + delta) * 10) / 10);
+  wk.baseWkKm = wk.wkKm; // reset base so nudge works from current value
+  refreshWeekCard(wk, idx);
+  planData.totalKm = Math.round(planData.planWeeks.reduce((s, w) => s + w.wkKm, 0));
+  refreshStats();
+}
+
+function refreshWeekCard(wk, idx) {
+  // Update weekly km display
+  const kmEl = document.getElementById(`wk-km-${idx}`);
+  if (kmEl) kmEl.innerHTML = `<strong>${fmtDist(wk.wkKm)}</strong>`;
+
+  // Redistribute runs proportionally
+  const longPct = planData.rpw >= 5 ? 0.35 : planData.rpw === 4 ? 0.38 : planData.rpw === 3 ? 0.42 : 0.48;
+  const longDist = Math.round(wk.wkKm * longPct * 10) / 10;
+  const rest = wk.wkKm - longDist;
+
+  wk.runs.forEach((r, ri) => {
+    if (r.type === 'long') {
+      r.km = longDist;
+    } else {
+      r.km = Math.round((rest / (planData.rpw - 1)) * 10) / 10;
+    }
+  });
+
+  const runsEl = document.getElementById(`wk-runs-${idx}`);
+  if (runsEl) runsEl.innerHTML = renderRuns(wk.runs, typeLabelsG, badgeClassG);
+}
+
+function refreshStats() {
+  if (!planData) return;
+  const peak = Math.max(...planData.planWeeks.map(w => w.wkKm));
+  document.getElementById('plan-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-val">${planData.weeks}</div><div class="stat-lbl">Weeks</div></div>
+    <div class="stat-box"><div class="stat-val">${fmtDist(planData.totalKm)}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-box"><div class="stat-val">${planData.weeks * planData.rpw}</div><div class="stat-lbl">Runs</div></div>
+    <div class="stat-box"><div class="stat-val">${fmtDist(peak)}</div><div class="stat-lbl">Peak Wk</div></div>
+  `;
+}
+
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+}
+
+function resetPlan() {
+  document.getElementById('plan-section').style.display = 'none';
+  document.getElementById('form-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─────────────────────────────────────────────
+// iCAL EXPORT
+// ─────────────────────────────────────────────
+function exportICal() {
+  if (!planData) return;
+  const d = planData;
+
+  function icsTs(date, offsetMin = 0) {
+    const dt = new Date(date);
+    dt.setHours(7, offsetMin, 0, 0);
+    return dt.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+  }
+
+  const typeLabels = { easy: 'Easy Run', long: 'Long Run', tempo: 'Tempo Run' };
+  const lines = [
+    'BEGIN:VCALENDAR','VERSION:2.0',
+    'PRODID:-//PaceLab//Training Plan//EN',
+    'CALSCALE:GREGORIAN',
+    'X-WR-CALNAME:PaceLab Training',
+    'X-WR-CALDESC:Your personalised running plan from PaceLab'
+  ];
+
+  d.planWeeks.forEach(wk => {
+    wk.runs.forEach((r, ri) => {
+      const durationMin = Math.ceil((r.km * r.pace) / 60);
+      const title = `${typeLabels[r.type]} · ${r.km}km @ ${fmtPace(r.pace)}`;
+      const desc  = `Week ${wk.week} (${wk.label})\\nType: ${typeLabels[r.type]}\\nDistance: ${r.km}km\\nPace: ${fmtPace(r.pace)}\\n\\nPowered by PaceLab`;
+      lines.push(
+        'BEGIN:VEVENT',
+        `UID:pacelab-w${wk.week}-r${ri}-${Date.now()}@pacelab.app`,
+        `DTSTAMP:${icsTs(new Date())}`,
+        `DTSTART:${icsTs(r.date)}`,
+        `DTEND:${icsTs(r.date, durationMin)}`,
+        `SUMMARY:${title}`,
+        `DESCRIPTION:${desc}`,
+        'CATEGORIES:RUNNING,SPORT',
+        'END:VEVENT'
+      );
+    });
+  });
+
+  lines.push('END:VCALENDAR');
+  const ics  = lines.join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `pacelab-${distName(d.targetKm).replace(/\s/g,'-').toLowerCase()}-${d.weeks}wk.ics`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+// ─────────────────────────────────────────────
+// NAV DRAWER
+// ─────────────────────────────────────────────
+function toggleNav() {
+  const open = document.getElementById('nav-drawer').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('open', open);
+  document.getElementById('burger-btn').classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeNav() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('nav-overlay').classList.remove('open');
+  document.getElementById('burger-btn').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+</script>
+</body>
+</html>
