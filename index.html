@@ -1441,7 +1441,7 @@ function generatePlan() {
     const isCutbk  = !isTaper && !isRace && w % 4 === 0;
 
     let wkKm;
-    if (isRace)      wkKm = peak * 0.45;
+    if (isRace)       wkKm = peak * 0.45;
     else if (isTaper) wkKm = peak * 0.65;
     else {
       const p = (w - 1) / Math.max(weeks - 3, 1);
@@ -1450,9 +1450,38 @@ function generatePlan() {
     }
     wkKm = Math.round(wkKm * 10) / 10;
 
+    // ── Clamp week-on-week progression to max 12% increase ──────────
+    // Find previous non-cutback, non-taper, non-race week's volume
+    if (!isRace && !isTaper && !isCutbk && planWeeks.length > 0) {
+      const prevNormal = [...planWeeks].reverse().find(pw => !pw.isCutbk && !pw.isTaper && !pw.isRace);
+      if (prevNormal) {
+        const maxAllowed = prevNormal.wkKm * 1.12;
+        if (wkKm > maxAllowed) wkKm = Math.round(maxAllowed * 10) / 10;
+      }
+    }
+
+    // ── Long run: distance-capped and race-appropriate ───────────────
+    // Base percentage by frequency
     const longPct = rpw >= 5 ? 0.35 : rpw === 4 ? 0.38 : rpw === 3 ? 0.42 : 0.48;
-    const longDist = Math.round(wkKm * longPct * 10) / 10;
-    const rest     = wkKm - longDist;
+    let longDist  = Math.round(wkKm * longPct * 10) / 10;
+
+    // Hard caps by race distance — long run should never exceed these
+    const longCap = targetKm <= 5 ? 8 : targetKm <= 10 ? 15 : targetKm <= 21.1 ? 22 : 35;
+    longDist = Math.min(longDist, longCap);
+
+    // Minimum long run floor — scales up through the plan so peak long run is meaningful
+    // Floor grows from base value toward peak value as plan progresses
+    // Always capped at 45% of weekly volume so one run doesn't dominate the week
+    const floorBase = targetKm <= 5 ? 2 : targetKm <= 10 ? 5 : targetKm <= 21.1 ? 7 : 14;
+    const floorPeak = targetKm <= 5 ? 6 : targetKm <= 10 ? 12 : targetKm <= 21.1 ? 13 : 26;
+    const floorProg = Math.min((w - 1) / Math.max(weeks - 3, 1), 1);
+    // Marathon gets a higher cap (55%) so long run can grow to meaningful distances
+    const floorCap  = targetKm > 21.1 ? 0.55 : 0.50;
+    const longFloor = Math.min(floorBase + (floorPeak - floorBase) * floorProg, wkKm * floorCap);
+    if (!isRace && !isTaper && w > 2) longDist = Math.max(longDist, Math.round(longFloor * 10) / 10);
+
+    longDist = Math.round(longDist * 10) / 10;
+    const rest = wkKm - longDist;
 
     const runs = [];
     for (let r = 0; r < rpw; r++) {
@@ -1465,31 +1494,38 @@ function generatePlan() {
 
       let type, km, pace;
 
-      // Determine if this week gets a quality session
+      // Quality session logic
       // - Never in taper/race weeks, never in first 2 weeks
-      // - rpw >= 3 gets one quality session, rpw >= 5 gets two
-      const hasQuality = !isRace && !isTaper && w >= 3 && rpw >= 3;
-      const hasTwoQuality = hasQuality && rpw >= 5;
+      // - All rpw values (including 2) get at least one quality session
+      const hasQuality    = !isRace && !isTaper && w >= 3;
+      // Second quality session thresholds by race type
+      const hasTwoQuality = hasQuality && (targetKm <= 21.1 && !isSpeedEvent ? rpw >= 4 : rpw >= 5);
+      // Second quality slot: r=2 for 4-day plans (r=3 is long run), r=3 for 5+ day plans
+      const secondQualitySlot = rpw === 4 ? 2 : 3;
 
       if (r === rpw - 1) {
         // Last slot always = long run
         type = 'long';
         km   = longDist;
         pace = longPace;
+      } else if (rpw === 2 && hasQuality && r === 0) {
+        // 2-day plan: slot 0 = quality, slot 1 = long
+        type = qualityType;
+        km   = Math.round(rest * 0.9 * 10) / 10;
+        pace = qualityPace;
       } else if (hasQuality && r === 1) {
-        // First quality session (slot 2): intervals for 5K/10K, tempo for longer
+        // First quality session for rpw >= 3
         type = qualityType;
         km   = Math.round((rest / (rpw - 1)) * 0.85 * 10) / 10;
         pace = qualityPace;
-      } else if (hasTwoQuality && r === 3) {
-        // Second quality session (slot 4, high-volume plans only)
-        // 5K/10K gets tempo as second session; longer events get a second tempo
-        type = isSpeedEvent ? 'tempo' : 'tempo';
+      } else if (hasTwoQuality && r === secondQualitySlot) {
+        // Second quality session
+        type = 'tempo';
         km   = Math.round((rest / (rpw - 1)) * 0.80 * 10) / 10;
         pace = tempoPace;
       } else {
         type = 'easy';
-        km   = Math.round((rest / (rpw - 1)) * 10) / 10;
+        km   = Math.round((rest / Math.max(rpw - 1, 1)) * 10) / 10;
         pace = easyPace;
       }
       runs.push({ type, km, pace, date: new Date(rd) });
