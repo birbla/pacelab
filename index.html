@@ -1676,8 +1676,9 @@ function exportICal() {
   d.planWeeks.forEach(wk => {
     wk.runs.forEach((r, ri) => {
       const durationMin = Math.ceil((r.km * r.pace) / 60);
-      const title = `${typeLabels[r.type]} · ${r.km}km @ ${fmtPace(r.pace)}`;
-      const desc  = `Week ${wk.week} (${wk.label})\\nType: ${typeLabels[r.type]}\\nDistance: ${r.km}km\\nPace: ${fmtPace(r.pace)}\\n\\nPowered by PaceLab`;
+      const intervalDetail = r.type === 'intervals' ? ` — ${intervalDesc(r.km)}` : '';
+      const title = `${typeLabels[r.type]} · ${r.km}km${intervalDetail} @ ${fmtPace(r.pace)}/km`;
+      const desc  = `Week ${wk.week} (${wk.label})\\nType: ${typeLabels[r.type]}\\nDistance: ${r.km}km${intervalDetail}\\nPace: ${fmtPace(r.pace)}/km\\n\\nPowered by PaceLab`;
       lines.push(
         'BEGIN:VEVENT',
         `UID:pacelab-w${wk.week}-r${ri}-${Date.now()}@pacelab.app`,
