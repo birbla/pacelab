@@ -1068,10 +1068,12 @@
       <div class="export-block">
         <div class="export-btns">
           <button class="btn btn-primary" onclick="exportICal()">⬇ Download iCal</button>
+          <button class="btn btn-ghost" onclick="savePlan()" id="save-plan-btn">🔗 Save Plan</button>
           <button class="btn btn-ghost" onclick="resetPlan()">← Edit</button>
         </div>
         <div class="export-note">
-          <strong style="color:#c8ff00">↓ iCal format</strong> — works with Google Calendar, Outlook &amp; Apple Calendar. One click, every session in your calendar.
+          <strong style="color:#c8ff00">↓ iCal format</strong> — works with Google Calendar, Outlook &amp; Apple Calendar. One click, every session in your calendar.<br>
+          <span style="color:#555">💡 Google Calendar tip: create a new calendar first (e.g. "PaceLab"), then import the file into it — keeps your plan in one place and lets you change colour or delete it all at once.</span>
         </div>
       </div>
     </div>
@@ -1249,6 +1251,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildPaceWheels();
   updateStartDateHint();
   updateCurrentKmDisplay();
+  restorePlanFromURL();
 });
 
 function setupChipGroup(id, cb) {
@@ -1730,7 +1733,111 @@ function resetPlan() {
 }
 
 // ─────────────────────────────────────────────
-// iCAL EXPORT
+// SAVE / RESTORE PLAN VIA URL
+// ─────────────────────────────────────────────
+function savePlan() {
+  if (!planData) return;
+
+  // Encode nudge adjustments — only weeks that differ from generated value
+  const nudges = planData.planWeeks.map(wk => Math.round(wk.wkKm));
+
+  const params = new URLSearchParams({
+    d:    planData.targetKm,
+    w:    planData.weeks,
+    rpw:  planData.rpw,
+    pace: Math.round(planData.paceSec),
+    base: getCurrentWeeklyKm(),
+    race: document.getElementById('race-date').value,
+    nudges: nudges.join(',')
+  });
+
+  const url = `${location.origin}${location.pathname}?${params.toString()}`;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('save-plan-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Link copied!';
+    btn.style.color = '#c8ff00';
+    btn.style.borderColor = '#c8ff00';
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2500);
+  }).catch(() => {
+    // Fallback: update URL bar so user can copy manually
+    history.replaceState(null, '', `?${params.toString()}`);
+    const btn = document.getElementById('save-plan-btn');
+    btn.innerHTML = '✓ URL updated — copy from address bar';
+    setTimeout(() => { btn.innerHTML = '🔗 Save Plan'; }, 3000);
+  });
+}
+
+function restorePlanFromURL() {
+  const params = new URLSearchParams(location.search);
+  if (!params.has('d') || !params.has('pace')) return;
+
+  const d     = parseFloat(params.get('d'));
+  const w     = parseInt(params.get('w'));
+  const rpw   = parseInt(params.get('rpw'));
+  const pace  = parseInt(params.get('pace'));
+  const base  = parseInt(params.get('base') || '0');
+  const race  = params.get('race');
+  const nudgesRaw = params.get('nudges');
+
+  if (!d || !w || !rpw || !pace) return;
+
+  // Restore form state
+  const distSel = document.getElementById('distance');
+  const knownDists = ['5','10','21.1','42.2'];
+  if (knownDists.includes(String(d))) {
+    distSel.value = String(d);
+  } else {
+    distSel.value = 'custom';
+    document.getElementById('custom-distance').value = d;
+    document.getElementById('custom-dist-wrap').style.display = 'flex';
+  }
+
+  if (race) document.getElementById('race-date').value = race;
+
+  // Set wheels
+  selectedWeeks = Math.min(24, Math.max(4, w));
+  selectedRuns  = Math.min(7, Math.max(2, rpw));
+  paceMinutes   = Math.floor(pace / 60);
+  paceSeconds   = pace % 60;
+  currentWeeklyKm = Math.min(150, Math.max(0, base));
+
+  // Re-render wheels to show correct position
+  buildWheel('weeks-col', 4, 24, selectedWeeks, v => {
+    selectedWeeks = v;
+    document.getElementById('weeks-display').innerHTML = `Length: <strong>${v} week${v===1?'':'s'}</strong>`;
+    updateStartDateHint();
+  });
+  buildWheel('runs-col', 2, 7, selectedRuns, v => {
+    selectedRuns = v;
+    document.getElementById('runs-display').innerHTML = `Frequency: <strong>${v} day${v===1?'':'s'} / week</strong>`;
+  });
+  buildPaceWheels();
+  updateCurrentKmDisplay();
+  updateStartDateHint();
+
+  // Generate plan
+  generatePlan();
+
+  // Apply nudges after plan is generated
+  if (nudgesRaw) {
+    const nudges = nudgesRaw.split(',').map(Number);
+    nudges.forEach((km, idx) => {
+      if (!planData || !planData.planWeeks[idx]) return;
+      const diff = km - planData.planWeeks[idx].wkKm;
+      if (Math.abs(diff) > 0.5) {
+        planData.planWeeks[idx].wkKm = km;
+        refreshWeekCard(planData.planWeeks[idx], idx);
+      }
+    });
+    planData.totalKm = Math.round(planData.planWeeks.reduce((s, w) => s + w.wkKm, 0));
+    refreshStats();
+  }
+}
 // ─────────────────────────────────────────────
 function exportICal() {
   if (!planData) return;
