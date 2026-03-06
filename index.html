@@ -865,6 +865,20 @@
     <a href="/gold-coast-marathon" class="nav-link"><span class="nav-icon">📍</span>Gold Coast Marathon</a>
     <a href="/sydney-marathon" class="nav-link"><span class="nav-icon">📍</span>Sydney Marathon</a>
     <a href="/melbourne-marathon" class="nav-link"><span class="nav-icon">📍</span>Melbourne Marathon</a>
+    <a href="/canberra-marathon" class="nav-link"><span class="nav-icon">📍</span>Canberra Marathon</a>
+    <a href="/noosa-marathon" class="nav-link"><span class="nav-icon">📍</span>Noosa Marathon</a>
+    <a href="/sunshine-coast-marathon" class="nav-link"><span class="nav-icon">📍</span>Sunshine Coast Marathon</a>
+    <a href="/great-ocean-road-marathon" class="nav-link"><span class="nav-icon">📍</span>Great Ocean Road Marathon</a>
+    <a href="/perth-city-to-surf" class="nav-link"><span class="nav-icon">📍</span>Perth City to Surf</a>
+    <a href="/adelaide-marathon" class="nav-link"><span class="nav-icon">📍</span>Adelaide Marathon</a>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">
+    <div class="nav-section-label">Training Concepts</div>
+    <a href="/what-is-a-tempo-run" class="nav-link"><span class="nav-icon">🔥</span>What is a Tempo Run?</a>
+    <a href="/interval-training" class="nav-link"><span class="nav-icon">⚡</span>Interval Training</a>
+    <a href="/how-to-taper" class="nav-link"><span class="nav-icon">📉</span>How to Taper</a>
+    <a href="/easy-running-8020-rule" class="nav-link"><span class="nav-icon">💚</span>The 80/20 Rule</a>
   </div>
 </nav>
 
@@ -1180,7 +1194,7 @@ function updateCurrentKmDisplay() {
 // INIT
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Default race date → 12 weeks from next Monday
+  // Default race date → today
   const raceInput = document.getElementById('race-date');
   const today = new Date();
   raceInput.value = today.toISOString().split('T')[0];
