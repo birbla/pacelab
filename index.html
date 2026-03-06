@@ -230,6 +230,25 @@
     .hero {
       padding: 72px 0 56px;
     }
+    .trust-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .trust-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(200,255,0,0.08) !important;
+      border: 1px solid rgba(200,255,0,0.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: #c8ff00 !important;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
     .hero-pill {
       display: inline-flex;
       align-items: center;
@@ -898,7 +917,11 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-pill">Free · No account required</div>
+    <div class="trust-badges">
+  <div class="trust-badge">✓ Free</div>
+  <div class="trust-badge">✓ No account required</div>
+  <div class="trust-badge">✓ Exports to Google, Outlook &amp; Apple Calendar</div>
+</div>
     <h1>Train<br>smarter.<br><em>Race faster.</em></h1>
     <div class="hero-divider"></div>
     <p class="hero-desc">Enter your goal, your pace, and your schedule. Get a structured week-by-week training plan — exportable straight to your calendar.</p>
@@ -1043,7 +1066,7 @@
           <button class="btn btn-ghost" onclick="resetPlan()">← Edit</button>
         </div>
         <div class="export-note">
-          Works with Apple Calendar, Google Calendar &amp; Outlook.
+          <strong style="color:#c8ff00">↓ iCal format</strong> — works with Google Calendar, Outlook &amp; Apple Calendar. One click, every session in your calendar.
         </div>
       </div>
     </div>
@@ -1778,34 +1801,29 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); 
   .chat-fab {
     position: fixed;
     bottom: 28px; right: 28px;
-    width: 60px; height: 60px;
+    height: 48px;
     background: #c8ff00;
-    border-radius: 50%;
+    border-radius: 100px;
     border: none;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 20px 0 16px;
+    font-size: 22px;
     box-shadow: 0 4px 24px rgba(200,255,0,0.35);
     z-index: 300;
     transition: transform 0.2s, box-shadow 0.2s;
   }
-  .chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 32px rgba(200,255,0,0.5); }
-  .chat-fab .fab-tooltip {
-    position: absolute;
-    right: 70px;
-    background: #1e1e1e;
-    border: 1px solid #333;
-    color: #f2f2f2;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    padding: 8px 12px;
-    border-radius: 8px;
+  .chat-fab:hover { transform: scale(1.04); box-shadow: 0 6px 32px rgba(200,255,0,0.5); }
+  .chat-fab .fab-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #000;
     white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
   }
-  .chat-fab:hover .fab-tooltip { opacity: 1; }
+  .chat-fab .fab-tooltip { display: none; }
 
   .chat-backdrop {
     position: fixed; inset: 0;
@@ -1952,7 +1970,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); 
 <!-- FAB button -->
 <button class="chat-fab" id="chat-fab" onclick="openChat()" aria-label="Ask your AI coach">
   🏃
-  <span class="fab-tooltip">Ask your AI coach</span>
+  <span class="fab-label">Ask your AI coach</span>
 </button>
 
 <!-- Backdrop -->
