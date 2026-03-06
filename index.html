@@ -2109,7 +2109,8 @@ async function sendChat() {
     removeTyping(typingId);
 
     if (!response.ok) {
-      appendAIMessage(`Error ${response.status}: ${data.error || 'Something went wrong. Try again.'}`);
+      const errMsg = data.error?.message || JSON.stringify(data.error) || 'Unknown error';
+      appendAIMessage(`Error ${response.status}: ${errMsg}`);
     } else if (data.content && data.content[0]) {
       const reply = data.content[0].text;
       chatHistory.push({ role: 'assistant', content: reply });
