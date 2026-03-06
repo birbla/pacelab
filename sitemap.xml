@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Core tools -->
+  <url><loc>https://pacelab.fitness/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://pacelab.fitness/pace-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Training guides -->
+  <url><loc>https://pacelab.fitness/parkrun-training-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pacelab.fitness/5k-training-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pacelab.fitness/10k-training-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pacelab.fitness/half-marathon-training-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pacelab.fitness/marathon-training-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Race pages -->
+  <url><loc>https://pacelab.fitness/city2surf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/bridge-to-brisbane</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/gold-coast-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/sydney-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/melbourne-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/canberra-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/noosa-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/sunshine-coast-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/great-ocean-road-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/perth-city-to-surf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/adelaide-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Training concepts -->
+  <url><loc>https://pacelab.fitness/what-is-a-tempo-run</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/interval-training</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/how-to-taper</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/easy-running-8020-rule</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+</urlset>
