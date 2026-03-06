@@ -25,10 +25,16 @@
   <url><loc>https://pacelab.fitness/perth-city-to-surf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pacelab.fitness/adelaide-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 
+  <url><loc>https://pacelab.fitness/brisbane-marathon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
   <!-- Training concepts -->
   <url><loc>https://pacelab.fitness/what-is-a-tempo-run</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pacelab.fitness/interval-training</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pacelab.fitness/how-to-taper</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://pacelab.fitness/easy-running-8020-rule</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/what-is-a-long-run</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/how-to-run-your-first-5k</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://pacelab.fitness/boston-marathon-qualifying-times-australia</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pacelab.fitness/running-warm-up</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 
 </urlset>
