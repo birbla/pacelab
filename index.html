@@ -2109,8 +2109,7 @@ async function sendChat() {
     removeTyping(typingId);
 
     if (!response.ok) {
-      const errMsg = data.error?.message || JSON.stringify(data.error) || 'Unknown error';
-      appendAIMessage(`Error ${response.status}: ${errMsg}`);
+      appendAIMessage("Sorry, something went wrong. Try again in a moment.");
     } else if (data.content && data.content[0]) {
       const reply = data.content[0].text;
       chatHistory.push({ role: 'assistant', content: reply });
@@ -2120,7 +2119,7 @@ async function sendChat() {
     }
   } catch (err) {
     removeTyping(typingId);
-    appendAIMessage(`Connection error: ${err.message}`);
+    appendAIMessage("I'm having trouble connecting right now. Check your internet and try again.");
   }
 
   document.getElementById('chat-send').disabled = false;
