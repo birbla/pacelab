@@ -1747,16 +1747,20 @@ function exportICal() {
     'BEGIN:VCALENDAR','VERSION:2.0',
     'PRODID:-//PaceLab//Training Plan//EN',
     'CALSCALE:GREGORIAN',
-    'X-WR-CALNAME:PaceLab Training',
-    'X-WR-CALDESC:Your personalised running plan from PaceLab'
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:PaceLab Training Plan',
+    'X-WR-CALDESC:Your personalised running plan from PaceLab',
+    'X-WR-TIMEZONE:Australia/Sydney',
+    'X-APPLE-CALENDAR-COLOR:#C8FF00'
   ];
 
   d.planWeeks.forEach(wk => {
     wk.runs.forEach((r, ri) => {
       const durationMin = Math.ceil((r.km * r.pace) / 60);
       const intervalDetail = r.type === 'intervals' ? ` — ${intervalDesc(r.km)}` : '';
-      const title = `${typeLabels[r.type]} · ${r.km}km${intervalDetail} @ ${fmtPace(r.pace)}/km`;
-      const desc  = `Week ${wk.week} (${wk.label})\\nType: ${typeLabels[r.type]}\\nDistance: ${r.km}km${intervalDetail}\\nPace: ${fmtPace(r.pace)}/km\\n\\nPowered by PaceLab`;
+      const paceStr = fmtPace(r.pace);
+      const title = `${typeLabels[r.type]} · ${Math.round(r.km)}km${intervalDetail} @ ${paceStr}`;
+      const desc  = `Week ${wk.week} (${wk.label})\\nType: ${typeLabels[r.type]}\\nDistance: ${Math.round(r.km)}km${intervalDetail}\\nPace: ${paceStr}\\n\\nPowered by PaceLab`;
       lines.push(
         'BEGIN:VEVENT',
         `UID:pacelab-w${wk.week}-r${ri}-${Date.now()}@pacelab.app`,
